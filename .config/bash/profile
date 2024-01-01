@@ -1,0 +1,39 @@
+# shellcheck shell=bash
+# shellcheck enable=all
+# vim: ft=bash
+
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+# shellcheck source=../xdg/base-directories
+test -r ~/.config/xdg/base-directories \
+  && source "${_}"
+
+# Configure less.
+[[ -n ${XDG_CACHE_HOME} ]] \
+  && test -d "${XDG_CACHE_HOME}/less" \
+  && export LESSHISTFILE="${_}/history"
+
+# Configure ls.
+export TIME_STYLE="+%Y-%m-%d %H:%M:%S.%3N"
+
+# Configure the PATH variable.
+if [[ -d ~/.local/bin ]]; then
+  case "${PATH}" in
+    "${HOME}/.local/bin:"*|*":${HOME}/.local/bin:"*|*"${HOME}/.local/bin")
+      ;;
+    *)
+      PATH="${HOME}/.local/bin:${PATH}"
+      ;;
+  esac
+fi
+
+# Configure systemd.
+export SYSTEMD_PAGER=
+
+# Configure vim.
+# https://blog.joren.ga/vim-xdg
+test -r "${XDG_CONFIG_HOME}/vim/vimrc" \
+  && export VIMINIT="set nocompatible | source ${_}"
+
+# shellcheck source=bashrc
+test -r "${XDG_CONFIG_HOME:-${HOME}/.config}/bash/bashrc" \
+  && source "${_}"

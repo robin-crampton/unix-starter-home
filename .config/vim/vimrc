@@ -1,0 +1,130 @@
+" https://blog.joren.ga/vim-xdg
+
+if empty($MYVIMRC) | let $MYVIMRC = expand('<sfile>:p') | endif
+
+if empty($XDG_CACHE_HOME)  | let $XDG_CACHE_HOME  = $HOME."/.cache"       | endif
+if empty($XDG_CONFIG_HOME) | let $XDG_CONFIG_HOME = $HOME."/.config"      | endif
+if empty($XDG_DATA_HOME)   | let $XDG_DATA_HOME   = $HOME."/.local/share" | endif
+if empty($XDG_STATE_HOME)  | let $XDG_STATE_HOME  = $HOME."/.local/state" | endif
+
+set runtimepath^=$XDG_CONFIG_HOME/vim
+set runtimepath+=$XDG_DATA_HOME/vim
+set runtimepath+=$XDG_CONFIG_HOME/vim/after
+
+set packpath^=$XDG_DATA_HOME/vim
+set packpath+=$XDG_DATA_HOME/vim/after
+
+let g:netrw_home = $XDG_DATA_HOME."/vim"
+
+call mkdir($XDG_DATA_HOME."/vim/spell", 'p', 0700)
+
+set backupdir=$XDG_CACHE_HOME/vim/backup | call mkdir(&backupdir, 'p', 0700)
+set directory=$XDG_CACHE_HOME/vim/swap   | call mkdir(&directory, 'p', 0700)
+set undodir=$XDG_CACHE_HOME/vim/undo     | call mkdir(&undodir,   'p', 0700)
+set viewdir=$XDG_CACHE_HOME/vim/view     | call mkdir(&viewdir,   'p', 0700)
+
+if !has('nvim') " Neovim has its own location which already complies with XDG specification
+  set viminfofile=$XDG_CACHE_HOME/vim/viminfo
+endif
+
+" Indent by 2 spaces but expand real tabs to 8 spaces.
+" To enter a real tab type C-q TAB.
+set softtabstop=2
+set shiftwidth=2
+set expandtab
+set autoindent
+set textwidth=0
+
+" Configure search.
+set noincsearch
+set ignorecase
+set smartcase
+
+" Use the most accurate but slowest syntax highlighting.
+autocmd BufEnter * :syntax sync fromstart
+
+" Disable automatic comment continuation.
+autocmd BufEnter * :set formatoptions-=o formatoptions-=r
+
+" Enable 24-bit colours.
+set termguicolors
+set t_8f=[38;2;%lu;%lu;%lum
+set t_8b=[48;2;%lu;%lu;%lum
+
+" Disable emboldening.
+" https://stackoverflow.com/a/41617004
+set t_md=
+
+" Disable mouse code recognition.
+set ttymouse=
+
+" Set the colour scheme.
+" https://github.com/tomasiser/vim-code-dark
+" https://github.com/tomasiser/vim-code-dark#customization
+"   'If you don't like many colors and prefer the conservative style of the standard Visual Studio'
+let g:codedark_conservative=1
+" Activates italicized comments (make sure your terminal supports italics)
+"let g:codedark_italics=1
+" Make the background transparent
+let g:codedark_transparent=1
+" If you have vim-airline, you can also enable the provided theme
+"let g:airline_theme = 'codedark'
+colorscheme codedark
+
+" Update the colours.
+" Identify the syntax highlighting group used at the cursor (for debugging).
+"map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+"\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+"\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+" From ~/.local/share/vim/pack/themes/start/vim-code-dark/colors/codedark.vim
+fun! <sid>hi(group, fg, bg, attr, sp)
+  if !empty(a:fg)
+    exec "hi " . a:group . " guifg=" . a:fg.gui . " ctermfg=" . (g:codedark_term256 ? a:fg.cterm256 : a:fg.cterm)
+  endif
+  if !empty(a:bg)
+    exec "hi " . a:group . " guibg=" . a:bg.gui . " ctermbg=" . (g:codedark_term256 ? a:bg.cterm256 : a:bg.cterm)
+  endif
+  if a:attr != ""
+    exec "hi " . a:group . " gui=" . a:attr . " cterm=" . a:attr
+  endif
+  if !empty(a:sp)
+    exec "hi " . a:group . " guisp=" . a:sp.gui
+  endif
+endfun
+let s:cterm05 = "07"
+let s:cterm00 = "00"
+" The colour updates.
+let s:cdFront = {'gui': '#9d9c9a', 'cterm': s:cterm05, 'cterm256': '188'}
+let s:cdBack = {'gui': '#252627', 'cterm': s:cterm00, 'cterm256': '234'}
+call <sid>hi('Normal', s:cdFront, s:cdBack, 'none', {})
+call <sid>hi('Identifier', s:cdFront, s:cdBack, 'none', {})
+call <sid>hi('Function', s:cdFront, s:cdBack, 'none', {})
+
+" Block cursor in command mode, line cursor in insert mode.
+" https://superuser.com/a/634327
+" https://vimhelp.org/term.txt.html
+" https://superuser.com/questions/607478/how-do-you-change-the-xterm-cursor-to-an-i-beam-or-vertical-bar
+" Put terminal into termcap mode. Steady block.
+let &t_ti .= "\e[2 q"
+" Start insert mode. Steady bar.
+let &t_SI .= "\e[6 q"
+" End insert or replace mode. Steady block.
+let &t_EI .= "\e[2 q"
+" End of termcap mode.
+let &t_te .= "\e[0 q"
+
+" Highlight trailing whitespace and spaces before a tab.
+" Like this:    
+" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+autocmd Syntax * syn match Search /\s\+$\| \+\ze\t/ containedin=ALL
+
+" Use "jj" to leave insert mode.
+" https://stackoverflow.com/questions/1737163/traversing-text-in-insert-mode
+imap jj <esc>
+
+" Commands for specific file types.
+autocmd FileType asm setlocal noexpandtab
+autocmd FileType asm setlocal shiftwidth=8
+autocmd FileType asm setlocal softtabstop=8
+autocmd BufNewFile,BufRead *.jspf set filetype=jsp
+autocmd FileType markdown setlocal textwidth=72

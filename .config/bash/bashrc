@@ -1,0 +1,184 @@
+# shellcheck shell=bash
+# shellcheck enable=all
+# vim: ft=bash
+
+# If not running interactively, don't do anything.
+[[ $- =~ i ]] \
+  || return
+
+# Configure the "readline" library.
+if [[ -n ${XDG_CONFIG_HOME} ]] && test -f "${XDG_CONFIG_HOME}/readline/inputrc"; then
+  export INPUTRC="${_}"
+  bind -f "${INPUTRC}"
+fi
+
+# Configure the prompt.
+ps1_prompt_character="$"
+if [[ -n ${WINDIR} && -d ${WINDIR} ]]; then
+  if hash cygpath 2>/dev/null; then
+    if cygpath_system32_net="$(cygpath "${WINDIR}/System32/net")"; then
+      if test -x "${cygpath_system32_net}" && "${_}" "session" &>/dev/null; then
+        ps1_prompt_character="#"
+      fi
+    fi
+  fi
+elif [[ -n ${EUID} ]]; then
+  ((EUID == 0)) \
+    && ps1_prompt_character="#"
+elif euid="$(id -u)"; then
+  ((euid == 0)) \
+    && ps1_prompt_character="#"
+  unset euid
+fi
+# A darker shade of the foreground colour.
+# https://superdevresources.com/tools/color-shades#9d9c9a
+ps1_rgb="91;90;88"
+if [[ -f ${XDG_CONFIG_HOME}/bash/danger-prompt ]]; then
+  # A darker shade of red.
+  # https://mdigi.tools/color-shades/#d25252
+  ps1_rgb="187;47;47"
+elif [[ -f ${XDG_CONFIG_HOME}/bash/blue-prompt ]]; then
+  # A darker shade of NHS Blue.
+  # https://www.england.nhs.uk/nhsidentity/identity-guidelines/colours/
+  # https://mdigi.tools/color-shades/#005eb8
+  ps1_rgb="0;91;179"
+fi
+PS1='\[\e]0;\u@'"${HOSTNAME,,}"':\w\a\]\[\e[38;2;'"${ps1_rgb}"'m\]\u@'"${HOSTNAME,,}"':\w\n'"${ps1_prompt_character}"'\[\e[0m\] \[\e[6 q\]'
+unset ps1_prompt_character ps1_rgb
+
+# Configure "ls" colours.
+if hash dircolors 2>/dev/null && test -f "${XDG_CONFIG_HOME}/ls/dircolors-solarized/dircolors.256dark.no-bold"; then
+  if dircolors="$(dircolors --bourne-shell "${_}")"; then
+    eval "${dircolors}"
+    unset dircolors
+  fi
+fi
+
+# Source the aliases file.
+# shellcheck source=aliases
+test -f "${XDG_CONFIG_HOME}/bash/aliases" \
+  && source "${_}"
+
+# Define Git helper functions.
+if hash git 2>/dev/null; then
+
+  ac() {
+    git add --verbose --all \
+      || return
+    # https://stackoverflow.com/a/5139672
+    if git diff --cached --exit-code >/dev/null; then
+      git status
+    elif (($# < 1)); then
+      git commit --verbose --allow-empty-message --message=""
+    else
+      git commit --verbose --message="$*"
+    fi
+  }
+
+  acp() {
+    git add --verbose --all \
+      || return
+    # https://stackoverflow.com/a/5139672
+    if git diff --cached --exit-code >/dev/null; then
+      git status
+    else
+      if (($# < 1)); then
+        git commit --verbose --allow-empty-message --message="" \
+          || return
+      else
+        git commit --verbose --message="$*" \
+          || return
+      fi
+      git push
+    fi
+  }
+
+  commit() {
+    if (($# < 1)); then
+      git commit --verbose --allow-empty-message --message=""
+    else
+      git commit --verbose --message="$*"
+    fi
+  }
+
+fi  # Git is available.
+
+# Do not add duplicate lines or lines starting with space to the history.
+HISTCONTROL="ignoreboth"
+
+# Append to the history file rather than overwriting it.
+shopt -s histappend
+
+# https://stackoverflow.com/questions/9457233/unlimited-bash-history
+[[ -n ${XDG_CACHE_HOME} && -d ${XDG_CACHE_HOME} ]] \
+  && HISTFILE="${XDG_CACHE_HOME}/bash/history"
+HISTFILESIZE=
+HISTSIZE=
+
+# Flush commands to the history file immediately.
+PROMPT_COMMAND="history -a; ${PROMPT_COMMAND}"
+
+# https://askubuntu.com/questions/391082/how-to-see-time-stamps-in-bash-history
+# Use the "history" builtin to see the timestamps.
+HISTTIMEFORMAT="%F %T "
+
+# Configure the directory search path.
+# https://mywiki.wooledge.org/BashPitfalls#pf48
+# https://unix.stackexchange.com/questions/456866/how-can-i-suppress-printing-the-full-path-to-subdirectories-when-using-cdpath
+CDPATH=:~
+
+# "Tracks your most used directories, based on 'frecency'."
+# https://github.com/rupa/z
+# "In computing, frecency is any heuristic that combines the frequency
+# and recency into a single measure."
+# https://en.wikipedia.org/wiki/Frecency
+if [[ -n ${XDG_CACHE_HOME} ]] && test -d "${XDG_CACHE_HOME}/z"; then
+  _Z_DATA="${_}/data"
+  _Z_NO_RESOLVE_SYMLINKS="true"
+  if test -f "${XDG_CONFIG_HOME}/z/z.sh"; then
+    # shellcheck source=../z/z.sh
+    # shellcheck disable=all
+    source "${_}"
+  fi
+fi
+
+# Define a function to change to a directory given as a Windows-format path.
+if hash cygpath 2>/dev/null; then
+  wcd() {
+    local cygpath
+    if cygpath="$(cygpath "$1")"; then
+      cd "${cygpath}" \
+        || return
+    fi
+  }
+fi
+
+# A command name that is the name of a directory is executed as if it were the
+# argument to the cd command.
+# This option is only used by interactive shells.
+shopt -s autocd
+
+# Minor errors in the spelling of a directory component in a cd command will be
+# corrected. The errors checked for are transposed characters, a missing
+# character, and one character too many. If a correction is found, the corrected
+# filename is printed, and the command proceeds.
+# This option is only used by interactive shells.
+shopt -s cdspell
+
+# Check the window size after each command and, if necessary, update the values
+# of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# Whenever bash sees foo.exe during completion, it checks if foo is the same
+# file and strips the suffix.
+hash cygpath 2>/dev/null \
+  && shopt -s completion_strip_exe
+
+# Replaces directory names with the results of word expansion when performing
+# filename completion. This changes the contents of the readline editing
+# buffer. If not set, bash attempts to preserve what the user typed.
+shopt -s direxpand
+
+# Attempt spelling correction on directory names during word completion if the
+# directory name initially supplied does not exist.
+shopt -s dirspell

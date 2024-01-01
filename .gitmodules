@@ -1,0 +1,15 @@
+[submodule ".config/ls/dircolors-solarized"]
+	path = .config/ls/dircolors-solarized
+	url = https://github.com/seebi/dircolors-solarized
+[submodule ".config/z"]
+	path = .config/z
+	url = https://github.com/rupa/z
+[submodule ".local/share/vim/pack/plugins/start/supertab"]
+	path = .local/share/vim/pack/plugins/start/supertab
+	url = https://github.com/ervandew/supertab
+[submodule ".local/share/vim/pack/plugins/start/vim-unimpaired"]
+	path = .local/share/vim/pack/plugins/start/vim-unimpaired
+	url = https://github.com/tpope/vim-unimpaired
+[submodule ".local/share/vim/pack/themes/start/vim-code-dark"]
+	path = .local/share/vim/pack/themes/start/vim-code-dark
+	url = https://github.com/tomasiser/vim-code-dark

@@ -1,0 +1,39 @@
+AllowBlinking=yes
+BackspaceSendsBS=yes
+BoldAsColour=no
+BoldAsFont=yes
+Charset=UTF-8
+Columns=150
+CursorBlinks=no
+CursorType=Line
+Font=Consolas
+#Font=JetBrains Mono NL
+FontHeight=11
+FontSmoothing=full
+Locale=en_GB
+Padding=-1
+RewrapOnResize=yes
+RowSpacing=1
+
+# Based on Dark Reader set to -15/80% brightness and -15/80% contrast.
+BackgroundColour=37,38,39     #252627
+ForegroundColour=157,156,154  #9d9c9a, 5.5:1  https://contrast-ratio.com/#rgb%28157%2C156%2C154%29-on-rgb%2837%2C38%2C39%29
+CursorColour=217,217,216      #d9d9d8, https://superdevresources.com/tools/color-shades#9d9c9a
+
+# Based on https://github.com/oumu/mintty-color-schemes/blob/master/4bit-default.minttyrc
+Black=0,0,0              #000000
+Red=210,82,82            #d25252
+Green=122,184,122        #7ab87a
+Yellow=184,184,122       #b8b87a
+Blue=0,135,255           #0087ff
+Magenta=184,122,184      #b87ab8
+Cyan=122,184,184         #7ab8b8
+White=217,217,217        #d9d9d9
+BoldBlack=38,38,38       #262626
+BoldRed=219,189,189      #dbbdbd
+BoldGreen=189,219,189    #bddbbd
+BoldYellow=219,219,189   #dbdbbd
+BoldBlue=189,189,219     #bdbddb
+BoldMagenta=219,189,219  #dbbddb
+BoldCyan=189,219,219     #bddbdb
+BoldWhite=255,255,255    #ffffff

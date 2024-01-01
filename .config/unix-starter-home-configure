@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# shellcheck enable=all
+# vim: ft=bash
+#
+# Configure a clone of repository:
+#   https://github.com/robin-crampton/unix-starter-home
+
+# Restrict access to directories.
+chmod 0700 \
+  "${HOME}/.cache" \
+  "${HOME}/.local/state" \
+  "${HOME}/.ssh"
+
+# Remove git-related files and directories.
+rm -f \
+  "${HOME}/.config/ls/dircolors-solarized/.git" \
+  "${HOME}/.config/z/.git" \
+  "${HOME}/.gitmodules" \
+  "${HOME}/.local/share/vim/pack/plugins/start/supertab/.git" \
+  "${HOME}/.local/share/vim/pack/plugins/start/vim-unimpaired/.git" \
+  "${HOME}/.local/share/vim/pack/themes/start/vim-code-dark/.git"
+find "${HOME}" -type f -name .gitignore -delete
+rm -rf "${HOME}/.git"
+
+# Remove redundant files.
+rm -f \
+  "${HOME}/LICENSE" \
+  "${HOME}/README.md"
+
+if [[ $(uname -s || true) =~ ^CYGWIN ]]; then
+  # Change the cygdrive path prefix for the user so that drives appear under
+  # /<drive-letter> instead of /cygdrive/<drive-letter>.
+  cat > "/etc/fstab.d/${USERNAME:?}" <<!
+none / cygdrive binary,posix=0,user 0 0
+!
+fi

@@ -1,0 +1,36 @@
+# shellcheck shell=bash
+# shellcheck enable=all
+# vim: ft=bash
+
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+
+[[ -z ${XDG_CACHE_HOME} ]] \
+  && XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_CACHE_HOME
+if test ! -d "${XDG_CACHE_HOME}"; then
+  # shellcheck disable=SC2174
+  mkdir --parents --mode=0700 "${_}" \
+    && mkdir --mode=0700 "${_}/bash"
+fi
+
+[[ -z ${XDG_CONFIG_HOME} ]] \
+  && XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CONFIG_HOME
+test ! -d "${XDG_CONFIG_HOME}" \
+  && mkdir --parents "${_}"
+
+[[ -z ${XDG_DATA_HOME} ]] \
+  && XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_DATA_HOME
+test ! -d "${XDG_DATA_HOME}" \
+  && mkdir --parents "${_}"
+
+[[ -z ${XDG_STATE_HOME} ]] \
+  && XDG_STATE_HOME="${HOME}/.local/state"
+export XDG_STATE_HOME
+# shellcheck disable=SC2174
+test ! -d "${XDG_STATE_HOME}" \
+  && mkdir --parents --mode=0700 "${_}"
+
+test ! -d "${HOME}/.local/bin" \
+  && mkdir --parents "${_}"

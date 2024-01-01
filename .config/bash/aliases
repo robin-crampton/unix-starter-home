@@ -1,0 +1,42 @@
+# shellcheck shell=bash
+# shellcheck enable=all
+# SC2139 (warning): This expands when defined, not when used. Consider escaping.
+# shellcheck disable=SC2139
+# vim: ft=bash
+
+if hash clear 2>/dev/null; then
+  alias c="clear"
+  alias cdc="cd && clear"
+fi
+
+alias ls="ls --color=auto --indicator-style=slash"
+alias l="ls"
+alias l1="ls -1"
+alias la="ls -A"
+alias ll="ls -l"
+alias lla="ls -Al"
+alias latr="ls -Altr"
+
+if hash git 2>/dev/null; then
+  alias add="git add --all"
+  alias gd="git diff"
+  alias gpl="git pull"
+  alias log="git log --stat"
+  alias push="git push"
+  alias s="git status"
+fi
+
+hash tmux 2>/dev/null \
+  && alias tmux="printf '\e]0;tmux\a' && tmux -u"
+
+hash wget 2>/dev/null \
+  && [[ -n ${XDG_CACHE_HOME} ]] \
+  && test -d "${XDG_CACHE_HOME}" \
+  && mkdir -p "${XDG_CACHE_HOME}/wget" \
+  && alias wget="wget --hsts-file='""${_}""/wget-hsts'"
+
+# Cygwin and Windows tools.
+if [[ $(uname -s || true) =~ ^CYGWIN ]]; then
+  hash cygstart 2>/dev/null  \
+    && alias f="cygstart ."
+fi
