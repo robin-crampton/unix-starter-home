@@ -28,9 +28,10 @@ rm -f \
   "${HOME}/README.md"
 
 if [[ $(uname -s || true) =~ ^CYGWIN ]]; then
-  # Change the cygdrive path prefix for the user so that drives appear under
-  # /<drive-letter> instead of /cygdrive/<drive-letter>.
+  # Change the cygdrive path prefix for the user so that drives are mounted on
+  # /mnt/<drive-letter> instead of /cygdrive/<drive-letter> for compatibility
+  # with the Filesystem Hierarchy Standard and the Windows Subsystem for Linux.
   cat > "/etc/fstab.d/${USERNAME:?}" <<!
-none / cygdrive binary,posix=0,user 0 0
+none /mnt cygdrive binary,posix=0,user 0 0
 !
 fi
