@@ -49,9 +49,9 @@ The script:
 
   * restricts access to directories `~/.cache`, `~/.local/state` and
     `~/.ssh`
-  * removes git-related files and directories created by the
-    installation process
-  * removes redundant files such as this README.md
+  * removes git-related files and directories created by the `git clone`
+    above.
+  * removes redundant files such as this README
   * if running under Cygwin, changes the
     [cygdrive path prefix](https://cygwin.com/cygwin-ug-net/using.html#cygdrive)
     for the user so that drives are mounted on `/mnt/<drive-letter>`
