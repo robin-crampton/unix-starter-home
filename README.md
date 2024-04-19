@@ -47,15 +47,18 @@ The repository contains submodules from these repositories:
 
 The script:
 
-  * restricts access to directories `~/.cache`, `~/.local/state` and `~/.ssh`
-  * removes git-related files and directories
-  * removes redundant files
+  * restricts access to directories `~/.cache`, `~/.local/state` and
+    `~/.ssh`
+  * removes git-related files and directories created by the
+    installation process
+  * removes redundant files such as this README.md
   * if running under Cygwin, changes the
     [cygdrive path prefix](https://cygwin.com/cygwin-ug-net/using.html#cygdrive)
-    for the user so that drives are mounted on `/mnt/<drive-letter>` instead
-    of `/cygdrive/<drive-letter>` for compatibility with the
+    for the user so that drives are mounted on `/mnt/<drive-letter>`
+    instead of `/cygdrive/<drive-letter>` for compatibility with the
     [Filesystem Hierarchy Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
-    and the [Windows Subsystem for Linux](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux).
+    and the
+    [Windows Subsystem for Linux](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux).
 
 ### Cygwin-specific installation steps
 
